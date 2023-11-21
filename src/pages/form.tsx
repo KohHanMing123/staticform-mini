@@ -39,7 +39,7 @@ export function CreateFormPage() {
       }
       const createdForm = await createForm.mutateAsync({ title: formData.title, textAnswer: formData.textAnswer, regularTextInput: formData.regularTextInput, checkboxAnswers: formData.checkboxAnswers, radioAnswer: formData.radioAnswer, dropdownAnswer: formData.dropdownAnswer, dateAnswer: formData.dateAnswer});
       console.log('Form created:', createdForm);
-      // router.push('/success-page'); // Redirect after successful form submission
+      // router.push('/success-page'); 
     } catch (error) {
       console.error('Error submitting form:', error);
     }
@@ -67,7 +67,7 @@ export function CreateFormPage() {
     const { value } = e.target;
     setFormData((prevState) => ({
       ...prevState,
-      radioAnswer: value, // Update the radioAnswer state when a radio option is selected
+      radioAnswer: value, 
     }));
   };
 
@@ -75,7 +75,7 @@ export function CreateFormPage() {
     const { value } = e.target;
     setFormData((prevState) => ({
       ...prevState,
-      dropdownAnswer: value, // Update the dropdownAnswer state when an option is selected
+      dropdownAnswer: value, 
     }));
   };
 

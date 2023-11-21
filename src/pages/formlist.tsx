@@ -42,7 +42,6 @@ export function FormList() {
                 >
                   Delete
                 </button>
-                {/* Add additional buttons or actions here */}
               </div>
             </div>
           </div>

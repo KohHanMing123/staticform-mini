@@ -26,12 +26,10 @@ export function FormDetails() {
   });
 
   
-    // Fetch form details based on formId from the URL
     const { data: formDetails, error: formDetailsError } = api.form.getFormById.useQuery({
       id: formId as string,
     });
 
-    // Update form data state when formDetails change
     useEffect(() => {
       if (formDetails && formDetails.title) {
         const checkboxValues = (formDetails.fields
@@ -115,7 +113,7 @@ export function FormDetails() {
             id="title"
             type="text"
             placeholder="Enter title"
-            value={formData.title || ''} // Populate value from state
+            value={formData.title || ''}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
           />
         </div>
@@ -199,7 +197,7 @@ export function FormDetails() {
               <input
                 id="radioOption1"
                 type="radio"
-                name="radioOptions" // Use the same name for grouping
+                name="radioOptions"
                 value="Chinese"
                 onChange={(e) => setFormData({ ...formData, radioAnswer: e.target.value })}
                 checked={formData.radioAnswer === 'Chinese'}
@@ -211,7 +209,7 @@ export function FormDetails() {
               <input
                 id="radioOption2"
                 type="radio"
-                name="radioOptions" // Use the same name for grouping
+                name="radioOptions" 
                 value="Malay"
                 onChange={(e) => setFormData({ ...formData, radioAnswer: e.target.value })}
                 checked={formData.radioAnswer === 'Malay'}
@@ -223,7 +221,7 @@ export function FormDetails() {
               <input
                 id="radioOption3"
                 type="radio"
-                name="radioOptions" // Use the same name for grouping
+                name="radioOptions" 
                 value="Indian"
                 onChange={(e) => setFormData({ ...formData, radioAnswer: e.target.value })}
                 checked={formData.radioAnswer === 'Indian'}
@@ -259,10 +257,10 @@ export function FormDetails() {
           <input
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             id="dateAnswer"
-            type="date" // Use type as 'date' for date input
+            type="date" 
             placeholder="Select date"
             value={formData.dateAnswer}
-            onChange={(e) => setFormData({ ...formData, dateAnswer: e.target.value })} // Handle date input change
+            onChange={(e) => setFormData({ ...formData, dateAnswer: e.target.value })} 
           />
         </div>
 
