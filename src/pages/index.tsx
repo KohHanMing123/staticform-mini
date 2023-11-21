@@ -52,7 +52,7 @@ function AuthShowcase() {
       {/* Link to FormList if signed in */}
       {sessionData && (
         <button onClick={() => router.push('/form')} className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20">
-          Form list page
+          Create Form page
         </button>
       )}
     </div>

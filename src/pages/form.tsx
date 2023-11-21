@@ -92,7 +92,7 @@ export function CreateFormPage() {
         onClick={() => router.push('/formlist')}
         className="rounded-full bg-slate-200 px-4 py-2 text-gray-700 font-semibold mt-4 ml-4 self-start"
       >
-        Back
+        Back to form list
       </button>
 
       <form onSubmit={handleSubmit} className="flex-grow max-w-3xl w-full md:w-2/3 lg:w-1/2 xl:w-1/3 shadow-md rounded p-6 mt-6 bg-white">
