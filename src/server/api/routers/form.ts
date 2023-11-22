@@ -44,6 +44,7 @@ export const formRouter = createTRPCRouter({
         radioAnswer: z.string().optional(),
         dropdownAnswer: z.string().optional(),
         dateAnswer: z.string().optional(),
+        photoPublicId: z.string().optional(),
       }),
     )
     .mutation(async ({ input }) => {
@@ -56,7 +57,10 @@ export const formRouter = createTRPCRouter({
           radioAnswer,
           dropdownAnswer,
           dateAnswer,
+          photoPublicId,
         } = input;
+
+        const concatenatedCheckboxValues = checkboxAnswers.join(", ");
 
         const formFields = [
           {
@@ -69,11 +73,11 @@ export const formRouter = createTRPCRouter({
             type: "text",
             value: regularTextInput,
           },
-          ...checkboxAnswers.map((checkboxLabel) => ({
+          {
             label: "Checkbox",
             type: "checkbox",
-            value: checkboxLabel,
-          })),
+            value: concatenatedCheckboxValues,
+          },
           ...(dropdownAnswer
             ? [
                 {
@@ -83,13 +87,21 @@ export const formRouter = createTRPCRouter({
                 },
               ]
             : []),
-
           ...(dateAnswer
             ? [
                 {
                   label: "Date",
                   type: "date",
                   value: dateAnswer,
+                },
+              ]
+            : []),
+          ...(photoPublicId
+            ? [
+                {
+                  label: "Upload Image",
+                  type: "upload",
+                  photoPublicId: photoPublicId,
                 },
               ]
             : []),
@@ -132,11 +144,13 @@ export const formRouter = createTRPCRouter({
             value: z.string().optional(),
           }),
         ),
+        photoPublicId: z.string().optional(),
       }),
     )
     .mutation(async ({ input }) => {
+      console.log("Received input:", input);
       try {
-        const { id, title, fields } = input;
+        const { id, title, fields, photoPublicId } = input;
 
         const existingForm = await db.form.findUnique({
           where: { id },
@@ -152,8 +166,33 @@ export const formRouter = createTRPCRouter({
           data: { title },
         });
 
-        const updatedFields = await Promise.all(
-          fields.map(async (newField) => {
+        let updatedFields = [];
+
+        if (photoPublicId) {
+          const existingImageField = existingForm.fields.find(
+            (field) => field.label === "Upload Image",
+          );
+
+          if (!existingImageField) {
+            throw new Error(`'Upload Image' field not found`);
+          }
+
+          const updatedImageField = await db.formField.update({
+            where: { id: existingImageField.id },
+            data: {
+              photoPublicId,
+            },
+          });
+
+          console.log("Updated image field:", updatedImageField);
+          updatedFields.push(updatedImageField);
+        }
+
+        const otherFieldsToUpdate = fields.filter(
+          (field) => field.label !== "Upload Image",
+        );
+        for (const newField of otherFieldsToUpdate) {
+          try {
             const existingField = existingForm.fields.find(
               (field) => field.label === newField.label,
             );
@@ -169,9 +208,18 @@ export const formRouter = createTRPCRouter({
               },
             });
 
-            return updatedField;
-          }),
-        );
+            updatedFields.push(updatedField);
+          } catch (error) {
+            console.error("Error updating field:", error);
+            if (typeof error === "string") {
+              throw new Error(`Failed to update field: ${error}`);
+            } else if (error instanceof Error) {
+              throw error;
+            } else {
+              throw new Error(`Failed to update field: Unknown error`);
+            }
+          }
+        }
 
         return { updatedForm, updatedFields };
       } catch (error: any) {

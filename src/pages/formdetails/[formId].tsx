@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { api } from "@/utils/api";
+import { CldUploadButton, CldUploadWidgetResults, CldImage} from 'next-cloudinary';
 
 interface FormData {
   title: string;
@@ -15,6 +16,8 @@ interface FormData {
 export function FormDetails() {
   const router = useRouter();
   const { formId } = router.query;
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string>('');
+  const [newPhotoPublicId, setNewPhotoPublicId] = useState<string>('');
   const [formData, setFormData] = useState<FormData>({
     title: '',
     textAnswer: '',
@@ -31,18 +34,25 @@ export function FormDetails() {
     });
 
     useEffect(() => {
+
+      
       if (formDetails && formDetails.title) {
-        const checkboxValues = (formDetails.fields
-          ?.filter((field) => field.label === 'Checkbox')
-          ?.map((checkboxField) => checkboxField.value) || []
-        ).filter((value) => value !== null);
-    
+        const checkboxField = formDetails.fields?.find((field) => field.label === 'Checkbox');
+        const checkboxValues = checkboxField?.value ? checkboxField.value.split(',').map(value => value.trim()) : [];
+ 
+        const uploadImageField = formDetails.fields?.find((field) => field.label === 'Upload Image');
+        if (uploadImageField) {
+          console.log('Photo Public ID from database:', uploadImageField.photoPublicId);
+          setImagePreviewUrl(uploadImageField.photoPublicId || ''); // Set the retrieved public ID for the image preview
+        }
+
+
         setFormData((prevFormData) => ({
           ...prevFormData,
           title: formDetails.title || '',
           textAnswer: formDetails.fields?.find((field) => field.label === 'Text Answer')?.value || '',
           regularTextInput: formDetails.fields?.find((field) => field.label === 'Text Input')?.value || '',
-          checkboxAnswers: checkboxValues as string[],
+          checkboxAnswers: checkboxValues,
           radioAnswer: formDetails.fields?.find((field) => field.label === 'Radio')?.value || '',
           dropdownAnswer: formDetails.fields?.find((field) => field.label === 'Dropdown')?.value || '',
           dateAnswer: formDetails.fields?.find((field) => field.label === 'Date')?.value || '',
@@ -59,6 +69,18 @@ export function FormDetails() {
       console.error('Error updating form:', error);
     },
   });
+
+  const handleUpload = (result: CldUploadWidgetResults) => {
+    if (typeof result === 'string') {
+      console.log('Result is a string:', result);
+    } else if ('info' in result && result.info && typeof result.info === 'object' && 'public_id' in result.info) {
+      const publicId = result.info.public_id;
+      console.log('Public ID in update:', publicId);
+      setNewPhotoPublicId(publicId as string); // Set the Cloudinary public ID in state
+      // Set the image preview URL dynamically
+     
+    }
+  };
   
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -75,9 +97,13 @@ export function FormDetails() {
       id: formId as string,
       title: formData.title,
       fields: updatedFields,
+      photoPublicId: newPhotoPublicId,
     };
   
     console.log('Form Data:', updatedFormData);
+
+    console.log('newPhotoPublicId before submission:', newPhotoPublicId);
+
     updateFormMutation.mutate(updatedFormData);
   };
   
@@ -263,6 +289,32 @@ export function FormDetails() {
             onChange={(e) => setFormData({ ...formData, dateAnswer: e.target.value })} 
           />
         </div>
+
+        <div className="mb-8">
+        {/* Display the image preview */}
+        {imagePreviewUrl && (
+          <div className="mb-4">
+            <label className="block text-lg font-semibold text-gray-700 mb-2" htmlFor="imagePreview">
+              Image retrieved from database 
+            </label>
+            <CldImage 
+            width="960"
+            height="600"
+            src={imagePreviewUrl} // Use the public ID to display the image
+            sizes="100vw"
+            alt="Image Preview"
+
+            />
+          </div>
+        )}
+        </div>
+
+        <CldUploadButton
+          className='bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded'
+          onUpload={handleUpload} 
+          uploadPreset="q9qlx4bf"
+        />
+
 
     
         <div className="flex items-center justify-end">

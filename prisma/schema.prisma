@@ -29,12 +29,13 @@ model Post {
     }
 
     model FormField {
-    id        String   @id @default(cuid())
-    label     String
-    type      String   // Represents the type of the field (e.g., 'text', 'radio', 'checkbox')
-    value     String?  // Store the selected value as a string
-    form      Form     @relation(fields: [formId], references: [id])
-    formId    String
+    id             String   @id @default(cuid())
+    label          String
+    type           String
+    value          String?  
+    form           Form     @relation(fields: [formId], references: [id])
+    formId         String
+    photoPublicId  String?  @default("")
     }
 
 

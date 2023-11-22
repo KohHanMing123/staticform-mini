@@ -4,8 +4,12 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { api } from "@/utils/api";
 
+import { CldUploadButton, CldUploadWidgetResults, CldImage} from 'next-cloudinary';
+
 export function CreateFormPage() {
   const router = useRouter();
+  const [cloudinaryPublicId, setCloudinaryPublicId] = useState<string>('');
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string>('');
   const [formData, setFormData] = useState<{
     title: string;
     textAnswer: string;
@@ -37,11 +41,32 @@ export function CreateFormPage() {
       if (!formData || !formData.title) {
         throw new Error('Form title is missing or invalid');
       }
-      const createdForm = await createForm.mutateAsync({ title: formData.title, textAnswer: formData.textAnswer, regularTextInput: formData.regularTextInput, checkboxAnswers: formData.checkboxAnswers, radioAnswer: formData.radioAnswer, dropdownAnswer: formData.dropdownAnswer, dateAnswer: formData.dateAnswer});
+      const createdForm = await createForm.mutateAsync({ 
+        title: formData.title,
+        textAnswer: formData.textAnswer,
+        regularTextInput: formData.regularTextInput,
+        checkboxAnswers: formData.checkboxAnswers,
+        radioAnswer: formData.radioAnswer,
+        dropdownAnswer: formData.dropdownAnswer,
+        dateAnswer: formData.dateAnswer,
+        photoPublicId: cloudinaryPublicId,
+      });
       console.log('Form created:', createdForm);
       // router.push('/success-page'); 
     } catch (error) {
       console.error('Error submitting form:', error);
+    }
+  };
+
+  const handleUpload = (result: CldUploadWidgetResults, widget: any) => {
+    if (typeof result === 'string') {
+      console.log('Result is a string:', result);
+    } else if ('info' in result && result.info && typeof result.info === 'object' && 'public_id' in result.info) {
+      const publicId = result.info.public_id;
+      console.log('Public ID:', publicId);
+      setCloudinaryPublicId(publicId as string); // Set the Cloudinary public ID in state
+      // Set the image preview URL dynamically
+      setImagePreviewUrl(`https://res.cloudinary.com/your-cloud-name/image/upload/${publicId}`);
     }
   };
 
@@ -255,6 +280,36 @@ export function CreateFormPage() {
           onChange={handleDateChange}
         />
       </div>
+
+      <div className="mb-8">
+        {/* Display the image preview */}
+        {imagePreviewUrl && (
+          <div className="mb-4">
+            <label className="block text-lg font-semibold text-gray-700 mb-2" htmlFor="imagePreview">
+              Image Preview 
+            </label>
+            <CldImage 
+            width="960"
+            height="600"
+            src={cloudinaryPublicId} // Use the public ID to display the image
+            sizes="100vw"
+            alt="Image Preview"
+
+            />
+          </div>
+        )}
+        </div>
+      <div>
+      <label className="block text-lg font-semibold text-gray-700 mb-2" htmlFor="dateAnswer">
+          Upload Image
+        </label>
+      </div>
+          
+      <CldUploadButton
+      className='bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded'
+      onUpload={handleUpload} 
+      uploadPreset="q9qlx4bf"
+      />
 
       <div className="flex items-center justify-end mt-6">
         <button
