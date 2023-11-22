@@ -35,7 +35,6 @@ export function FormDetails() {
 
     useEffect(() => {
 
-      
       if (formDetails && formDetails.title) {
         const checkboxField = formDetails.fields?.find((field) => field.label === 'Checkbox');
         const checkboxValues = checkboxField?.value ? checkboxField.value.split(',').map(value => value.trim()) : [];
@@ -69,6 +68,18 @@ export function FormDetails() {
       console.error('Error updating form:', error);
     },
   });
+
+  const handleShare = () => {
+    const formUrl = window.location.href; // Get the current URL
+    navigator.clipboard.writeText(formUrl) // Copy URL to clipboard
+      .then(() => {
+        alert('Form URL copied to clipboard');
+      })
+      .catch((error) => {
+        console.error('Failed to copy URL:', error);
+      });
+  };
+
 
   const handleUpload = (result: CldUploadWidgetResults) => {
     if (typeof result === 'string') {
@@ -125,8 +136,19 @@ export function FormDetails() {
 
   return (
     <div className="min-h-screen bg-purple-300 flex flex-col items-center justify-center">
-        <button onClick={() => router.push('/formlist')} className="rounded-full bg-slate-200 px-4 py-2 text-gray-700 font-semibold mt-4 ml-4 self-start"
-        >Back</button>
+        <button onClick={() => router.push('/formlist')} className="rounded-full bg-slate-200 px-4 py-2 text-gray-700 font-semibold mt-4 ml-4 self-start">
+          Back
+        </button>
+
+        <div className="flex items-center justify-end">
+        <button
+          onClick={handleShare}
+          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mr-4"
+        >
+          Share
+        </button>        
+      </div>
+
       <form className="flex-grow max-w-3xl w-full md:w-2/3 lg:w-1/2 xl:w-1/3 shadow-md rounded p-6 mt-6 bg-white"
             onSubmit={handleFormSubmit}>
          {/* Text Input */}

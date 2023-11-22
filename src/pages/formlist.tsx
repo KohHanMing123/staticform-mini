@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { api } from "@/utils/api";
 
+
 export function FormList() {
   const router = useRouter();
   const { mutate: deleteFormMutation } = api.form.deleteForm.useMutation();
@@ -27,6 +28,16 @@ export function FormList() {
   return (
     <div className="text-center bg-purple-200 min-h-screen">
       <h1 className="text-3xl font-bold mb-4">All Forms</h1>
+
+      <div className="flex justify-center mb-4">
+      <button
+        onClick={() => router.push('/form')}
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline"
+      >     
+        New Form
+      </button>
+    </div>
+
       <div className="flex flex-wrap justify-center">
         {allFormsError && <p>Error fetching all forms: {allFormsError.message}</p>}
         {fetchedForms.map((form) => (
