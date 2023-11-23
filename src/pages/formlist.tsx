@@ -1,13 +1,19 @@
-import { useEffect } from 'react';
+// Next.js imports
 import { useRouter } from 'next/router';
+
+// API and utility imports
 import { api } from "@/utils/api";
 
+// Toast
+import { toast } from "sonner";
 
 export function FormList() {
   const router = useRouter();
   const { mutate: deleteFormMutation } = api.form.deleteForm.useMutation();
 
   const { data: fetchedForms = [], error: allFormsError } = api.form.getAllForms.useQuery();
+
+  //to be used later 
 
   // useEffect(() => {
   // }, []);
@@ -19,7 +25,10 @@ export function FormList() {
   const handleDeleteForm = async (formId: string) => {
     try {
       await deleteFormMutation({ id: formId });
-      window.alert(`Form with ID ${formId} has been deleted.`);
+      toast.error('Form has been deleted');
+      setTimeout(() => {
+        router.reload();
+      }, 400);
     } catch (error) {
       console.error('Error deleting form:', error);
     }

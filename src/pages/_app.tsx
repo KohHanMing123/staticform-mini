@@ -3,6 +3,7 @@ import { SessionProvider } from "next-auth/react";
 import { type AppType } from "next/app";
 
 import { api } from "@/utils/api";
+import { Toaster } from "sonner";
 
 import "@/styles/globals.css";
 
@@ -12,7 +13,8 @@ const MyApp: AppType<{ session: Session | null }> = ({
 }) => {
   return (
     <SessionProvider session={session}>
-      <Component {...pageProps} />
+      <Toaster position="top-center" richColors/> 
+      <Component {...pageProps} /> 
     </SessionProvider>
   );
 };

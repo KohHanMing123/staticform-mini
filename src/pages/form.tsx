@@ -1,37 +1,61 @@
 "use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/router';
+// React imports
+import { useState } from "react";
+
+// Next.js imports
+import { useRouter } from "next/router";
+
+// API and utility imports
 import { api } from "@/utils/api";
 
-import { CldUploadButton, CldUploadWidgetResults, CldImage} from 'next-cloudinary';
+// Next.js Cloudinary components
+import {
+  CldUploadButton,
+  CldUploadWidgetResults,
+  CldImage,
+} from "next-cloudinary";
+
+// Custom components
+import TextInput from "@/components/TextInput";
+import TextArea from "@/components/TextArea";
+import RadioGroup from "@/components/RadioGroup";
+import Dropdown from "@/components/Dropdown";
+import DateInput from "@/components/DateInput";
+
+// Types
+import { FormData } from "@/types/Form";
+
+// Toast
+import { toast } from "sonner";
 
 export function CreateFormPage() {
   const router = useRouter();
-  const [cloudinaryPublicId, setCloudinaryPublicId] = useState<string>('');
-  const [imagePreviewUrl, setImagePreviewUrl] = useState<string>('');
-  const [formData, setFormData] = useState<{
-    title: string;
-    textAnswer: string;
-    regularTextInput: string;
-    checkboxAnswers: string[];
-    radioAnswer: string;
-    dropdownAnswer: string;
-    dateAnswer: string;
-  }>({
-    title: '',
-    textAnswer: '',
-    regularTextInput: '',
+  const [cloudinaryPublicId, setCloudinaryPublicId] = useState<string>("");
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string>("");
+  const [formData, setFormData] = useState<FormData>({
+    title: "",
+    textAnswer: "",
+    regularTextInput: "",
     checkboxAnswers: [],
-    radioAnswer: '',
-    dropdownAnswer: '',
-    dateAnswer: '',
+    radioAnswer: "",
+    dropdownAnswer: "",
+    dateAnswer: "",
   });
+  const promise = () => new Promise((resolve) => setTimeout(resolve, 2000));
 
   const createForm = api.form.createForm.useMutation({
     onSuccess: () => {
-      router.reload();
-      alert('Form created successfully');
+      toast.promise(promise, {
+          loading: 'Loading...',
+          success: () => {
+            return `Form has been added`;
+          },
+          error: 'Error',
+      });
+      setTimeout(() => {
+        router.reload();
+      }, 3000);
     },
   });
 
@@ -39,9 +63,9 @@ export function CreateFormPage() {
     e.preventDefault();
     try {
       if (!formData || !formData.title) {
-        throw new Error('Form title is missing or invalid');
+        throw new Error("Form title is missing or invalid");
       }
-      const createdForm = await createForm.mutateAsync({ 
+      const createdForm = await createForm.mutateAsync({
         title: formData.title,
         textAnswer: formData.textAnswer,
         regularTextInput: formData.regularTextInput,
@@ -51,22 +75,27 @@ export function CreateFormPage() {
         dateAnswer: formData.dateAnswer,
         photoPublicId: cloudinaryPublicId,
       });
-      console.log('Form created:', createdForm);
-      // router.push('/success-page'); 
+      console.log("Form created:", createdForm);
     } catch (error) {
-      console.error('Error submitting form:', error);
+      console.error("Error submitting form:", error);
     }
   };
 
   const handleUpload = (result: CldUploadWidgetResults, widget: any) => {
-    if (typeof result === 'string') {
-      console.log('Result is a string:', result);
-    } else if ('info' in result && result.info && typeof result.info === 'object' && 'public_id' in result.info) {
+    if (typeof result === "string") {
+      console.log("Result is a string:", result);
+    } else if (
+      "info" in result &&
+      result.info &&
+      typeof result.info === "object" &&
+      "public_id" in result.info
+    ) {
       const publicId = result.info.public_id;
-      console.log('Public ID:', publicId);
-      setCloudinaryPublicId(publicId as string); // Set the Cloudinary public ID in state
-      // Set the image preview URL dynamically
-      setImagePreviewUrl(`https://res.cloudinary.com/your-cloud-name/image/upload/${publicId}`);
+      console.log("Public ID:", publicId);
+      setCloudinaryPublicId(publicId as string);
+      setImagePreviewUrl(
+        `https://res.cloudinary.com/your-cloud-name/image/upload/${publicId}`,
+      );
     }
   };
 
@@ -77,251 +106,176 @@ export function CreateFormPage() {
       if (checked) {
         updatedCheckboxAnswers = [...prevState.checkboxAnswers, value];
       } else {
-        updatedCheckboxAnswers = prevState.checkboxAnswers.filter((item) => item !== value);
+        updatedCheckboxAnswers = prevState.checkboxAnswers.filter(
+          (item) => item !== value,
+        );
       }
-  
+
       return {
         ...prevState,
         checkboxAnswers: updatedCheckboxAnswers,
       };
     });
   };
-  
-
-    const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      radioAnswer: value, 
-    }));
-  };
-
-  const handleDropdownChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      dropdownAnswer: value, 
-    }));
-  };
-
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, dateAnswer: e.target.value });
-  };
-
-
-
 
   return (
-    <div className="min-h-screen bg-purple-300 flex flex-col items-center justify-center">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-purple-300">
       <button
-        onClick={() => router.push('/formlist')}
-        className="rounded-full bg-slate-200 px-4 py-2 text-gray-700 font-semibold mt-4 ml-4 self-start"
+        onClick={() => router.push("/formlist")}
+        className="ml-4 mt-4 self-start rounded-full bg-slate-200 px-4 py-2 font-semibold text-gray-700"
       >
         Back to form list
       </button>
 
-      <form onSubmit={handleSubmit} className="flex-grow max-w-3xl w-full md:w-2/3 lg:w-1/2 xl:w-1/3 shadow-md rounded p-6 mt-6 bg-white">
-        <div className="mb-8">
-          <label className="block text-lg font-semibold text-gray-700 mb-2" htmlFor="title">
-            Title
-          </label>
-          <input
-            className="border border-gray-300 rounded w-full py-3 px-4 text-lg text-gray-700 focus:outline-none focus:border-blue-500"
-            id="title"
-            type="text"
-            placeholder="Enter title"
-            value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-          />
-        </div>
-  
-       {/* Textarea Input */}
-      <div className="mb-8">
-        <label className="block text-lg font-semibold text-gray-700 mb-2" htmlFor="textAnswer">
-          About you
-        </label>
-        <textarea
-          className="border border-gray-300 rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:border-blue-500"
+      <form
+        onSubmit={handleSubmit}
+        className="mt-6 w-full max-w-3xl flex-grow rounded bg-white p-6 shadow-md md:w-2/3 lg:w-1/2 xl:w-1/3"
+      >
+        {/* Title */}
+        <TextInput
+          label="Title"
+          id="title"
+          value={formData.title}
+          onChange={(value) => setFormData({ ...formData, title: value })}
+        />
+          
+        {/* Text Area */}
+        <TextArea
+          label="About you"
           id="textAnswer"
-          placeholder="Enter text answer"
           value={formData.textAnswer}
-          onChange={(e) => setFormData({ ...formData, textAnswer: e.target.value })}
+          onChange={(value) => setFormData({ ...formData, textAnswer: value })}
+          placeholder="Enter text answer"
         />
-      </div>
-
-      {/* Regular Text Input */}
-      <div className="mb-8">
-        <label className="block text-lg font-semibold text-gray-700 mb-2" htmlFor="regularTextInput">
-          Name
-        </label>
-        <input
-          className="border border-gray-300 rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:border-blue-500"
+        
+        {/* Text Input */}
+        <TextInput
+          label="Name"
           id="regularTextInput"
-          type="text"
-          placeholder="Enter regular text"
           value={formData.regularTextInput}
-          onChange={(e) => setFormData({ ...formData, regularTextInput: e.target.value })}
+          onChange={(value) =>
+            setFormData({ ...formData, regularTextInput: value })
+          }
         />
-      </div>
 
-      {/* Checkboxes */}
-      <div className="mb-8">
-        <label className="block text-lg font-semibold text-gray-700 mb-2">
-          Preferred Hobbies
-        </label>
-        <div className="space-x-4">
-          <label htmlFor="checkbox1" className="inline-flex items-center">
-            <input
-              id="checkbox1"
-              type="checkbox"
-              value="Sports"
-              onChange={(e) => handleCheckboxChange(e)}
-              className="mr-2 h-5 w-5 rounded border-gray-300 focus:outline-none focus:ring-blue-500"
-            />
-            <span className="text-md text-black">Sports</span>
+        {/* Checkboxes */}
+        <div className="mb-8">
+          <label className="mb-2 block text-lg font-semibold text-gray-700">
+            Preferred Hobbies
           </label>
-          <label htmlFor="checkbox2" className="inline-flex items-center">
-            <input
-              id="checkbox2"
-              type="checkbox"
-              value="Music"
-              onChange={(e) => handleCheckboxChange(e)}
-              className="mr-2 h-5 w-5 rounded border-gray-300 focus:outline-none focus:ring-blue-500"
-            />
-            <span className="text-md text-black">Music</span>
-          </label>
-          <label htmlFor="checkbox3" className="inline-flex items-center">
-            <input
-              id="checkbox3"
-              type="checkbox"
-              value="Cooking"
-              onChange={(e) => handleCheckboxChange(e)}
-              className="mr-2 h-5 w-5 rounded border-gray-300 focus:outline-none focus:ring-blue-500"
-            />
-            <span className="text-md text-black">Cooking</span>
-          </label>
+          <div className="space-x-4">
+            <label htmlFor="checkbox1" className="inline-flex items-center">
+              <input
+                id="checkbox1"
+                type="checkbox"
+                value="Sports"
+                onChange={(e) => handleCheckboxChange(e)}
+                className="mr-2 h-5 w-5 rounded border-gray-300 focus:outline-none focus:ring-blue-500"
+              />
+              <span className="text-md text-black">Sports</span>
+            </label>
+            <label htmlFor="checkbox2" className="inline-flex items-center">
+              <input
+                id="checkbox2"
+                type="checkbox"
+                value="Music"
+                onChange={(e) => handleCheckboxChange(e)}
+                className="mr-2 h-5 w-5 rounded border-gray-300 focus:outline-none focus:ring-blue-500"
+              />
+              <span className="text-md text-black">Music</span>
+            </label>
+            <label htmlFor="checkbox3" className="inline-flex items-center">
+              <input
+                id="checkbox3"
+                type="checkbox"
+                value="Cooking"
+                onChange={(e) => handleCheckboxChange(e)}
+                className="mr-2 h-5 w-5 rounded border-gray-300 focus:outline-none focus:ring-blue-500"
+              />
+              <span className="text-md text-black">Cooking</span>
+            </label>
+          </div>
         </div>
-      </div>
 
+        {/* Radio Group */}
+        <RadioGroup
+          label="What is your race?"
+          options={[
+            { label: "Chinese", value: "Chinese" },
+            { label: "Malay", value: "Malay" },
+            { label: "Indian", value: "Indian" },
+          ]}
+          selectedValue={formData.radioAnswer}
+          onChange={(value) => setFormData({ ...formData, radioAnswer: value })}
+        />
 
-      {/* Radio Group */}
-      <div className="mb-8">
-        <label className="block text-lg font-semibold text-gray-700 mb-2">
-          What is your race?
-        </label>
-        <div className='space-x-4'>
-          <label htmlFor="radioOption1" className="inline-flex items-center">
-            <input
-              id="radioOption1"
-              type="radio"
-              name="radioOptions"
-              value="Chinese"
-              onChange={(e) => setFormData({ ...formData, radioAnswer: e.target.value })}
-              checked={formData.radioAnswer === 'Chinese'}
-            />
-            <span className="ml-2 text-black">Chinese</span>
-          </label>
-
-          <label htmlFor="radioOption1" className="inline-flex items-center">
-            <input
-              id="radioOption1"
-              type="radio"
-              name="radioOptions"
-              value="Malay"
-              onChange={(e) => setFormData({ ...formData, radioAnswer: e.target.value })}
-              checked={formData.radioAnswer === 'Malay'}
-            />
-            <span className="ml-2 text-black">Malay</span>
-          </label>
-
-          <label htmlFor="radioOption1" className="inline-flex items-center">
-            <input
-              id="radioOption1"
-              type="radio"
-              name="radioOptions"
-              value="Indian"
-              onChange={(e) => setFormData({ ...formData, radioAnswer: e.target.value })}
-              checked={formData.radioAnswer === 'Indian'}
-            />
-            <span className="ml-2 text-black">Indian</span>
-          </label>
-        </div>
-      </div>
-
-      {/* Dropdown Input */}
-      <div className="mb-8">
-        <label className="block text-lg font-semibold text-gray-700 mb-2" htmlFor="dropdownAnswer">
-          Preferred Game
-        </label>
-        <select
+        {/* Dropdown */}
+        <Dropdown
           id="dropdownAnswer"
           value={formData.dropdownAnswer}
-          onChange={handleDropdownChange}
-          className="border border-gray-300 rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:border-blue-500"
-        >
-          <option value="">Select</option>
-          <option value="CSGO">CSGO</option>
-          <option value="Fortnite">Fortnite</option>
-          <option value="Valorant">Valorant</option>
-        </select>
-      </div>
-
-      {/* Date Input */}
-      <div className="mb-8">
-        <label className="block text-lg font-semibold text-gray-700 mb-2" htmlFor="dateAnswer">
-          Date of Birth
-        </label>
-        <input
-          className="border border-gray-300 rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:border-blue-500"
-          id="dateAnswer"
-          type="date"
-          placeholder="Select date"
-          value={formData.dateAnswer}
-          onChange={handleDateChange}
+          onChange={(value) =>
+            setFormData({ ...formData, dropdownAnswer: value })
+          }
+          options={[
+            { label: "CSGO", value: "CSGO" },
+            { label: "Fortnite", value: "Fortnite" },
+            { label: "Valorant", value: "Valorant" },
+          ]}
         />
-      </div>
 
-      <div className="mb-8">
-        {/* Display the image preview */}
-        {imagePreviewUrl && (
-          <div className="mb-4">
-            <label className="block text-lg font-semibold text-gray-700 mb-2" htmlFor="imagePreview">
-              Image Preview 
-            </label>
-            <CldImage 
-            width="960"
-            height="600"
-            src={cloudinaryPublicId} // Use the public ID to display the image
-            sizes="100vw"
-            alt="Image Preview"
+        {/* Date Input */}
+        <DateInput
+          id="dateAnswer"
+          value={formData.dateAnswer}
+          onChange={(value) => setFormData({ ...formData, dateAnswer: value })}
+        />
 
-            />
-          </div>
-        )}
+        <div className="mb-8">
+          {/* Display the image preview */}
+          {imagePreviewUrl && (
+            <div className="mb-4">
+              <label
+                className="mb-2 block text-lg font-semibold text-gray-700"
+                htmlFor="imagePreview"
+              >
+                Image Preview
+              </label>
+              <CldImage
+                width="960"
+                height="600"
+                src={cloudinaryPublicId}
+                sizes="100vw"
+                alt="Image Preview"
+              />
+            </div>
+          )}
         </div>
-      <div>
-      <label className="block text-lg font-semibold text-gray-700 mb-2" htmlFor="dateAnswer">
-          Upload Image
-        </label>
-      </div>
-          
-      <CldUploadButton
-      className='bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded'
-      onUpload={handleUpload} 
-      uploadPreset="q9qlx4bf"
-      />
+        <div>
+          <label
+            className="mb-2 block text-lg font-semibold text-gray-700"
+            htmlFor="dateAnswer"
+          >
+            Upload Image
+          </label>
+        </div>
 
-      <div className="flex items-center justify-end mt-6">
-        <button
-          type="submit"
-          className="bg-slate-200 hover:bg-slate-400 text-black font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-        >
-          Submit
-        </button>
-      </div>
-    </form>
-  </div>
-);
+        <CldUploadButton
+          className="rounded bg-red-500 px-4 py-2 font-bold text-white hover:bg-red-700"
+          onUpload={handleUpload}
+          uploadPreset="q9qlx4bf"
+        />
+
+        <div className="mt-6 flex items-center justify-end">
+          <button
+            type="submit"
+            className="focus:shadow-outline rounded bg-slate-200 px-4 py-2 font-bold text-black hover:bg-slate-400 focus:outline-none"
+          >
+            Submit
+          </button>
+        </div>
+      </form>
+    </div>
+  );
 }
 
 export default CreateFormPage;
