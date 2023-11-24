@@ -47,6 +47,10 @@ export function FormDetails() {
     api.form.getFormById.useQuery({
       id: formId as string,
     });
+    
+    if (formDetailsError) {
+      console.error('Form details retrieval error:', formDetailsError);
+    }
 
   useEffect(() => {
     if (formDetails && formDetails.title) {

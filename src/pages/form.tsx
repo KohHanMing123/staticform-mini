@@ -91,14 +91,15 @@ export function CreateFormPage() {
       typeof result.info === "object" &&
       "public_id" in result.info
     ) {
-      const publicId = result.info.public_id;
+      const publicId = result.info.public_id as string;
       console.log("Public ID:", publicId);
-      setCloudinaryPublicId(publicId as string);
+      setCloudinaryPublicId(publicId);
       setImagePreviewUrl(
         "https://res.cloudinary.com/your-cloud-name/image/upload/" + publicId,
       );
     }
   };
+  
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
