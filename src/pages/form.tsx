@@ -121,17 +121,17 @@ export function CreateFormPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-purple-300">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100">
       <button
-        onClick={() => router.push("/formlist")}
-        className="ml-4 mt-4 self-start rounded-full bg-slate-200 px-4 py-2 font-semibold text-gray-700"
+        onClick={() => router.push('/formlist')}
+        className="self-start mt-4 mb-8 ml-4 px-4 py-2 font-semibold rounded-lg bg-indigo-500 text-white"
       >
-        Back to form list
+        Back to Form List
       </button>
 
       <form
         onSubmit={handleSubmit}
-        className="mt-6 w-full max-w-3xl flex-grow rounded bg-white p-6 shadow-md md:w-2/3 lg:w-1/2 xl:w-1/3"
+        className="w-full max-w-3xl rounded-lg bg-white p-6 shadow-md md:w-2/3 lg:w-1/2 xl:w-2/3"
       >
         {/* Title */}
         <TextInput

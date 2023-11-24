@@ -7,6 +7,10 @@ import { api } from "@/utils/api";
 // Toast
 import { toast } from "sonner";
 
+// Icons
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash, faPlus } from '@fortawesome/free-solid-svg-icons';
+
 export function FormList() {
   const router = useRouter();
   const { mutate: deleteFormMutation } = api.form.deleteForm.useMutation();
@@ -20,7 +24,6 @@ export function FormList() {
 
   const handleFormClick = async (formId: string) => {
     await router.push(`/formdetails/${encodeURIComponent(formId)}`);
-    // Any code that needs to be executed after the route change
   };
 
   const handleDeleteForm = (formId: string) => {
@@ -29,39 +32,50 @@ export function FormList() {
       toast.error('Form has been deleted');
       setTimeout(() => {
         router.reload();
-      }, 400);
+      }, 800);
     } catch (error) {
       console.error('Error deleting form:', error);
     }
   };
 
   return (
-    <div className="text-center bg-purple-200 min-h-screen">
-      <h1 className="text-3xl font-bold mb-4">All Forms</h1>
+    <div className="text-center bg-gray-100 min-h-screen py-8 px-4">
+      <h1 className="text-5xl font-bold mb-8 text-indigo-800">All Forms</h1>
 
-      <div className="flex justify-center mb-4">
-      <button
-        onClick={() => router.push('/form')}
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline"
-      >     
-        New Form
-      </button>
-    </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+        <div
+          onClick={() => router.push('/form')}
+          className="bg-indigo-200 rounded-lg shadow-md border-dashed border-2 border-indigo-500 p-8 cursor-pointer flex justify-center items-center col-span-1 transition duration-300 transform hover:scale-105"
+          style={{ minHeight: '200px' }}
+        >
+          <FontAwesomeIcon icon={faPlus} className="text-indigo-600 mr-3 h-8 w-8" />
+          <span className="text-indigo-800 text-xl font-semibold">Create New Form</span>
+        </div>
 
-      <div className="flex flex-wrap justify-center">
-        {allFormsError && <p>Error fetching all forms: {allFormsError.message}</p>}
+        {allFormsError && <p className="text-red-600">Error fetching all forms: {allFormsError.message}</p>}
         {fetchedForms.map((form) => (
-          <div key={form.id} className="max-w-md w-full md:w-1/3 lg:w-1/4 mx-4 my-4 bg-slate-200 rounded-lg shadow-md overflow-hidden">
-            <div className="px-6 py-4">
-              <p className="text-xl font-semibold mb-2 cursor-pointer" onClick={() => handleFormClick(form.id)}>
-                Title: {form.title}
-              </p>
-              <div className="flex justify-between">
+          <div
+            key={form.id}
+            onClick={() => handleFormClick(form.id)}
+            className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 cursor-pointer transition duration-300 transform hover:shadow-lg"
+            style={{ minHeight: '200px', padding: '30px' }}
+          >
+            <div className="h-full flex flex-col justify-between">
+              <div>
+                <p className="text-2xl text-center font-semibold mb-4 cursor-pointer text-indigo-800">
+                  <span className="block pt-10">{form.title}</span>
+                </p>
+              </div>
+              <div className="flex justify-end">
                 <button
-                  onClick={() => handleDeleteForm(form.id)}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleDeleteForm(form.id);
+                  }}
                   className="text-sm text-red-600 hover:text-red-700 font-semibold focus:outline-none"
                 >
-                  Delete
+                  <FontAwesomeIcon icon={faTrash} className="mr-2 h-5 w-5" />
+                  
                 </button>
               </div>
             </div>
@@ -70,6 +84,6 @@ export function FormList() {
       </div>
     </div>
   );
-}
+} 
 
 export default FormList;
