@@ -23,7 +23,7 @@ export function FormList() {
     // Any code that needs to be executed after the route change
   };
 
-  const handleDeleteForm = async (formId: string) => {
+  const handleDeleteForm = (formId: string) => {
     try {
       deleteFormMutation({ id: formId });
       toast.error('Form has been deleted');
