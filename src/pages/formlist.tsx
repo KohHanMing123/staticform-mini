@@ -18,13 +18,14 @@ export function FormList() {
   // useEffect(() => {
   // }, []);
 
-  const handleFormClick = (formId: string) => {
-    router.push(`/formdetails/${encodeURIComponent(formId)}`);
+  const handleFormClick = async (formId: string) => {
+    await router.push(`/formdetails/${encodeURIComponent(formId)}`);
+    // Any code that needs to be executed after the route change
   };
 
   const handleDeleteForm = async (formId: string) => {
     try {
-      await deleteFormMutation({ id: formId });
+      deleteFormMutation({ id: formId });
       toast.error('Form has been deleted');
       setTimeout(() => {
         router.reload();

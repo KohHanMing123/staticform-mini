@@ -11,8 +11,13 @@ export const formRouter = createTRPCRouter({
     try {
       const forms = await db.form.findMany();
       return forms;
-    } catch (error: any) {
-      throw new Error(`Failed to fetch all forms: ${error.message}`);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        const errorMessage = error.message || 'Unknown error occurred';
+        throw new Error(`Failed to fetch all forms: ${errorMessage}`);
+      } else {
+        throw new Error('An unknown error occurred');
+      }
     }
   }),
 
@@ -29,8 +34,13 @@ export const formRouter = createTRPCRouter({
           throw new Error(`Form with ID ${id} not found`);
         }
         return form;
-      } catch (error: any) {
-        throw new Error(`Failed to fetch form by ID: ${error.message}`);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          const errorMessage = error.message || 'Unknown error occurred';
+          throw new Error(`Failed to fetch form by ID: ${errorMessage}`);
+        } else {
+          throw new Error('An unknown error occurred');
+        }
       }
     }),
 
@@ -128,8 +138,13 @@ export const formRouter = createTRPCRouter({
         });
 
         return createdForm;
-      } catch (error: any) {
-        throw new Error(`Failed to create form: ${error.message}`);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          const errorMessage = error.message || 'Unknown error occurred';
+          throw new Error(`Failed to create form: ${errorMessage}`);
+        } else {
+          throw new Error('An unknown error occurred');
+        }
       }
     }),
 
@@ -166,7 +181,7 @@ export const formRouter = createTRPCRouter({
           data: { title },
         });
 
-        let updatedFields = [];
+        const updatedFields = [];
 
         if (photoPublicId) {
           const existingImageField = existingForm.fields.find(
@@ -204,7 +219,7 @@ export const formRouter = createTRPCRouter({
             const updatedField = await db.formField.update({
               where: { id: existingField.id },
               data: {
-                value: newField.value || existingField.value,
+                value: newField.value ?? existingField.value,
               },
             });
 
@@ -222,8 +237,13 @@ export const formRouter = createTRPCRouter({
         }
 
         return { updatedForm, updatedFields };
-      } catch (error: any) {
-        throw new Error(`Failed to update form: ${error.message}`);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          const errorMessage = error.message || 'Unknown error occurred';
+          throw new Error(`Failed to update form: ${errorMessage}`);
+        } else {
+          throw new Error('An unknown error occurred');
+        }
       }
     }),
 
@@ -242,8 +262,13 @@ export const formRouter = createTRPCRouter({
         });
 
         return deletedForm;
-      } catch (error: any) {
-        throw new Error(`Failed to delete form: ${error.message}`);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          const errorMessage = error.message || 'Unknown error occurred';
+          throw new Error(`Failed to delete form: ${errorMessage}`);
+        } else {
+          throw new Error('An unknown error occurred');
+        }
       }
     }),
 
