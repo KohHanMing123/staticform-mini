@@ -1,5 +1,5 @@
 import React from 'react';
-import { InputFieldProps } from '@/types/FormField';
+import type { InputFieldProps } from '@/types/FormField';
 
 
 const TitleInput: React.FC<InputFieldProps> = ({ label, id, value, onChange, type = 'text', placeholder = '' }) => {

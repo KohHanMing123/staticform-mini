@@ -1,5 +1,5 @@
 import React from 'react';
-import { DropdownProps } from '@/types/FormField';
+import type { DropdownProps } from '@/types/FormField';
 
 
 const Dropdown: React.FC<DropdownProps> = ({ id, value, onChange, options }) => {

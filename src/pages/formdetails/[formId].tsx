@@ -10,9 +10,10 @@ import { api } from "@/utils/api";
 // Next.js Cloudinary components
 import {
   CldUploadButton,
-  CldUploadWidgetResults,
   CldImage,
 } from "next-cloudinary";
+
+import type { CldUploadWidgetResults } from "next-cloudinary";
 
 // Custom components
 import TextInput from "@/components/TextInput";
@@ -22,7 +23,7 @@ import Dropdown from "@/components/Dropdown";
 import DateInput from "@/components/DateInput";
 
 // Types
-import { FormData } from "@/types/Form";
+import type { FormData } from "@/types/Form";
 
 // Toast
 import { toast } from "sonner";
@@ -64,7 +65,7 @@ export function FormDetails() {
           "Photo Public ID from database:",
           uploadImageField.photoPublicId,
         );
-        setImagePreviewUrl(uploadImageField.photoPublicId || ""); 
+        setImagePreviewUrl(uploadImageField.photoPublicId ?? ""); 
       }
 
       setFormData((prevFormData) => ({
@@ -72,19 +73,19 @@ export function FormDetails() {
         title: formDetails.title || "",
         textAnswer:
           formDetails.fields?.find((field) => field.label === "Text Answer")
-            ?.value || "",
+            ?.value ?? "",
         regularTextInput:
           formDetails.fields?.find((field) => field.label === "Text Input")
-            ?.value || "",
+            ?.value ?? "",
         checkboxAnswers: checkboxValues,
         radioAnswer:
-          formDetails.fields?.find((field) => field.label === "Radio")?.value ||
+          formDetails.fields?.find((field) => field.label === "Radio")?.value ??
           "",
         dropdownAnswer:
           formDetails.fields?.find((field) => field.label === "Dropdown")
-            ?.value || "",
+            ?.value ?? "",
         dateAnswer:
-          formDetails.fields?.find((field) => field.label === "Date")?.value ||
+          formDetails.fields?.find((field) => field.label === "Date")?.value ??
           "",
       }));
     }

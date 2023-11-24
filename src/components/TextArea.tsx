@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextAreaProps } from '@/types/FormField';
+import type { TextAreaProps } from '@/types/FormField';
 
 
 const TextArea: React.FC<TextAreaProps> = ({ label, id, value, onChange, placeholder = '' }) => {

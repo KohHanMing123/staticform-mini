@@ -1,5 +1,5 @@
 import React from 'react';
-import { DateInputProps } from '@/types/FormField';
+import type { DateInputProps } from '@/types/FormField';
 
 const DateInput: React.FC<DateInputProps> = ({ id, value, onChange }) => {
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {

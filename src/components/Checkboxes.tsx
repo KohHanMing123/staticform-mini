@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckboxProps } from '@/types/FormField';
+import type { CheckboxProps } from '@/types/FormField';
 
 
 const Checkbox: React.FC<CheckboxProps> = ({ label, id, value, onChange }) => {

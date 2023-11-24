@@ -12,9 +12,10 @@ import { api } from "@/utils/api";
 // Next.js Cloudinary components
 import {
   CldUploadButton,
-  CldUploadWidgetResults,
   CldImage,
 } from "next-cloudinary";
+
+import type { CldUploadWidgetResults } from "next-cloudinary";
 
 // Custom components
 import TextInput from "@/components/TextInput";
@@ -24,7 +25,7 @@ import Dropdown from "@/components/Dropdown";
 import DateInput from "@/components/DateInput";
 
 // Types
-import { FormData } from "@/types/Form";
+import type { FormData } from "@/types/Form";
 
 // Toast
 import { toast } from "sonner";
@@ -62,7 +63,7 @@ export function CreateFormPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      if (!formData || !formData.title) {
+      if (!formData ?? !formData.title) {
         throw new Error("Form title is missing or invalid");
       }
       const createdForm = await createForm.mutateAsync({
@@ -81,7 +82,7 @@ export function CreateFormPage() {
     }
   };
 
-  const handleUpload = (result: CldUploadWidgetResults, widget: any) => {
+  const handleUpload = (result: CldUploadWidgetResults) => {
     if (typeof result === "string") {
       console.log("Result is a string:", result);
     } else if (
@@ -94,7 +95,7 @@ export function CreateFormPage() {
       console.log("Public ID:", publicId);
       setCloudinaryPublicId(publicId as string);
       setImagePreviewUrl(
-        `https://res.cloudinary.com/your-cloud-name/image/upload/${publicId}`,
+        "https://res.cloudinary.com/your-cloud-name/image/upload/" + publicId,
       );
     }
   };

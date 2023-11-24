@@ -1,5 +1,5 @@
 import React from 'react';
-import { RadioGroupProps } from '@/types/FormField';
+import type { RadioGroupProps } from '@/types/FormField';
 
 
 const RadioGroup: React.FC<RadioGroupProps> = ({ label, options, selectedValue, onChange }) => {
