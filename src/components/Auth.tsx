@@ -3,9 +3,7 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 
 
-interface AuthProps {}
-
-const Auth: React.FC<AuthProps> = () => {
+const Auth: React.FC = () => {
     const { data: sessionData } = useSession();
     const router = useRouter();
  
